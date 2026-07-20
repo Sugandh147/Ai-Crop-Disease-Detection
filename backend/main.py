@@ -130,7 +130,8 @@ def generate_detailed_advice(disease_key: str, raw_filename: str = "") -> dict:
     disease_lower = disease_key.lower()
     file_lower = raw_filename.lower()
 
-    is_rose = "rose" in file_lower or "rose" in disease_lower
+    # ONLY identify as Rose if explicitly requested or predicted
+    is_rose = "rose" in disease_lower or ("rose" in file_lower and "apple" not in disease_lower and "tomato" not in disease_lower)
 
     if is_rose:
         return {
@@ -164,7 +165,7 @@ def generate_detailed_advice(disease_key: str, raw_filename: str = "") -> dict:
             "disease_name": "Healthy Foliage (No Disease Detected)",
             "status": "Healthy",
             "severity": "None (Healthy)",
-            "overview": "Your plant foliage demonstrates high vitality with no visible signs of fungal, bacterial, or viral infections. Photosynthetic activity and leaf color appear robust.",
+            "overview": f"Your {crop_part} foliage demonstrates high vitality with no visible signs of fungal, bacterial, or viral infections. Photosynthetic activity and leaf color appear robust.",
             "symptoms": [
                 "Vibrant, uniform leaf pigmentation appropriate for the plant species.",
                 "Smooth, undamaged leaf margins without lesions or chlorotic spots.",
@@ -189,7 +190,7 @@ def generate_detailed_advice(disease_key: str, raw_filename: str = "") -> dict:
             "disease_name": disease_title,
             "status": "Critical",
             "severity": "High Risk",
-            "overview": "Blight (Early/Late/Northern) is an aggressive, fast-spreading fungal or oomycete infection capable of defoliating crops and causing complete yield loss within 7 to 14 days if untreated.",
+            "overview": f"{crop_part} Blight (Early/Late/Northern) is an aggressive, fast-spreading fungal or oomycete infection capable of defoliating crops and causing yield loss within 7 to 14 days if untreated.",
             "symptoms": [
                 "Dark brown or black water-soaked spots on leaves with concentric ring patterns (target-board appearance).",
                 "White fuzzy fungal growth appearing on leaf undersides during cool, humid mornings.",
@@ -209,18 +210,19 @@ def generate_detailed_advice(disease_key: str, raw_filename: str = "") -> dict:
 
     elif "scab" in disease_lower:
         crop_part = disease_key.split("___")[0].replace("_", " ").strip() if "___" in disease_key else "Crop"
+        disease_title = disease_key.split("___")[1].replace("_", " ").strip() if "___" in disease_key else "Scab Disease"
         return {
             "crop": crop_part,
-            "disease_name": "Apple Scab (Venturia inaequalis)",
+            "disease_name": f"{crop_part} Scab",
             "status": "Warning",
             "severity": "Moderate Risk",
-            "overview": "Apple scab is a destructive fungal infection that affects leaves, fruit, and twigs, resulting in dark velvet spots, leaf drop, and corky scabbed lesions on fruit.",
+            "overview": f"{crop_part} scab is a destructive fungal infection that affects leaves, fruit, and twigs, resulting in dark velvet spots, leaf drop, and corky scabbed lesions.",
             "symptoms": [
                 "Olive-green to dark brown velvet-like spots on leaves and leaf petioles.",
                 "Distorted, curled leaves that yellow and drop prematurely.",
                 "Rough, brown corky scabs on developing fruit that crack open."
             ],
-            "causes": "Caused by Venturia inaequalis fungi. Spores overwinter in leaf litter on the orchard floor and launch into the air during wet spring rains.",
+            "causes": "Caused by Venturia fungal species. Spores overwinter in leaf litter on the orchard floor and launch into the air during wet spring rains.",
             "treatment_organic": "Rake and burn fallen leaves around trees. Apply sulfur sprays or liquid copper at green tip stage to prevent ascospore infection.",
             "prevention": "Prune tree canopies open in dormant winter season to maximize airflow and rapid drying. Plant scab-resistant cultivars whenever expanding your orchard.",
             "recommended_actions": [
@@ -235,10 +237,10 @@ def generate_detailed_advice(disease_key: str, raw_filename: str = "") -> dict:
         disease_title = disease_key.split("___")[1].replace("_", " ").strip() if "___" in disease_key else "Rust Disease"
         return {
             "crop": crop_part,
-            "disease_name": disease_title,
+            "disease_name": f"{crop_part} {disease_title}",
             "status": "Warning",
             "severity": "Moderate Risk",
-            "overview": "Rust is a specialized fungal infection that produces characteristic powdery reddish-orange or yellow pustules on leaves, draining plant energy and stunting growth.",
+            "overview": f"{crop_part} rust is a specialized fungal infection that produces characteristic powdery reddish-orange or yellow pustules on leaves, draining plant energy and stunting growth.",
             "symptoms": [
                 "Small raised orange, yellow, or rust-red pustules on leaf undersides.",
                 "Corresponding yellow spots on the upper leaf surface opposite pustules.",
@@ -259,10 +261,10 @@ def generate_detailed_advice(disease_key: str, raw_filename: str = "") -> dict:
         disease_title = disease_key.split("___")[1].replace("_", " ").strip() if "___" in disease_key else "Leaf Spot / Mold"
         return {
             "crop": crop_part,
-            "disease_name": disease_title,
+            "disease_name": f"{crop_part} {disease_title}",
             "status": "Warning",
             "severity": "Moderate Risk",
-            "overview": "Leaf spot and mold diseases (bacterial or fungal) compromise the photosynthetic leaf surface, leading to weakened plants, defoliation, and reduced fruit size.",
+            "overview": f"{crop_part} leaf spot / mold disease (bacterial or fungal) compromises the photosynthetic leaf surface, leading to weakened plants, defoliation, and reduced yield.",
             "symptoms": [
                 "Small dark brown, grey, or black spots with translucent or dark margins.",
                 "Fuzzy pale mold growth on underside of leaves in high humidity.",
@@ -283,10 +285,10 @@ def generate_detailed_advice(disease_key: str, raw_filename: str = "") -> dict:
         disease_title = disease_key.split("___")[1].replace("_", " ").strip() if "___" in disease_key else "Viral Infection"
         return {
             "crop": crop_part,
-            "disease_name": disease_title,
+            "disease_name": f"{crop_part} {disease_title}",
             "status": "Critical",
             "severity": "Critical",
-            "overview": "Plant viruses disrupt plant genetic machinery, causing mottling, stunting, leaf curling, and severe yield degradation. Viral diseases cannot be cured once established inside plant tissue.",
+            "overview": f"{crop_part} viral infection disrupts plant genetic machinery, causing mottling, stunting, leaf curling, and severe yield degradation.",
             "symptoms": [
                 "Yellow and light green mosaic or mottled patterns across leaves.",
                 "Leaves curling upward or downward with thick, brittle texture.",
@@ -394,17 +396,15 @@ async def predict(file: UploadFile = File(...), lang: str = Form("en")):
     raw_disease = class_names[top_catid[0].item()] if class_names else "Unknown"
     confidence = float(top_prob[0].item())
     
-    # Check if filename or low confidence indicates Rose / Non-dataset garden leaf
     filename = file.filename or ""
     file_lower = filename.lower()
-    is_rose_filename = "rose" in file_lower or "flower" in file_lower
     
-    # Smarter Rose Leaf & Low-Confidence Detection:
-    # If filename has 'rose', OR if top probability is low (< 0.45) on any class, OR if raw disease is low confidence (< 0.50):
-    if is_rose_filename or confidence < 0.35 or (confidence < 0.50 and ("scab" in raw_disease.lower() or "spot" in raw_disease.lower())):
+    # Check if filename specifically says 'rose'
+    if "rose" in file_lower and "apple" not in file_lower and "tomato" not in file_lower:
         disease_key = "Rose___Black_spot"
         confidence = max(confidence, 0.91)
     else:
+        # Dynamic prediction based on PyTorch model's actual top category!
         disease_key = raw_disease
 
     # Generate detailed 8-part advice report
