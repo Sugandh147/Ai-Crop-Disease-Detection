@@ -10,16 +10,28 @@ def train_model(data_dir, num_epochs=5, batch_size=32, save_path="model.pth"):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Using device: {device}")
 
+    # Check if dataset path exists
+    if not os.path.exists(data_dir):
+        print(f"Error: Dataset directory '{data_dir}' not found.")
+        print("Please download the PlantVillage dataset and specify the correct directory path.")
+        return None
+
     # 1. Load Data
     train_loader, val_loader, class_names = get_dataloaders(data_dir, batch_size=batch_size)
     num_classes = len(class_names)
     
     # Save class names for inference
     with open("class_names.json", "w") as f:
-        json.dump(class_names, f)
+        json.dump(class_names, f, indent=2)
+    print(f"Saved {num_classes} class names to class_names.json")
 
-    # 2. Setup Model (MobileNetV2 is fast and lightweight)
-    model = models.mobilenet_v2(pretrained=True)
+    # 2. Setup Model (MobileNetV2 with modern weights support)
+    try:
+        from torchvision.models import MobileNet_V2_Weights
+        model = models.mobilenet_v2(weights=MobileNet_V2_Weights.DEFAULT)
+    except (ImportError, AttributeError):
+        model = models.mobilenet_v2(pretrained=True)
+
     # Freeze early layers
     for param in model.parameters():
         param.requires_grad = False
@@ -36,8 +48,8 @@ def train_model(data_dir, num_epochs=5, batch_size=32, save_path="model.pth"):
     best_acc = 0.0
     
     for epoch in range(num_epochs):
-        print(f"Epoch {epoch+1}/{num_epochs}")
-        print("-" * 10)
+        print(f"\nEpoch {epoch+1}/{num_epochs}")
+        print("-" * 20)
         
         for phase in ['train', 'val']:
             if phase == 'train':
@@ -66,21 +78,20 @@ def train_model(data_dir, num_epochs=5, batch_size=32, save_path="model.pth"):
                         optimizer.step()
 
                 running_loss += loss.item() * inputs.size(0)
-                running_corrects += torch.sum(preds == labels.data)
+                running_corrects += torch.sum(preds == labels.data).item()
 
             epoch_loss = running_loss / len(dataloader.dataset)
-            epoch_acc = running_corrects.double() / len(dataloader.dataset)
+            epoch_acc = float(running_corrects) / len(dataloader.dataset)
 
-            print(f"{phase} Loss: {epoch_loss:.4f} Acc: {epoch_acc:.4f}")
+            print(f"{phase.capitalize()} Loss: {epoch_loss:.4f} Acc: {epoch_acc:.4f}")
 
             # Save the model if it's the best one
             if phase == 'val' and epoch_acc > best_acc:
                 best_acc = epoch_acc
                 torch.save(model.state_dict(), save_path)
-                print("Model saved!")
-        print()
+                print(f"--> Saved best model weights with accuracy: {best_acc:.4f}")
 
-    print(f"Training complete. Best val Acc: {best_acc:.4f}")
+    print(f"\nTraining complete. Best Validation Accuracy: {best_acc:.4f}")
     return model
 
 if __name__ == "__main__":

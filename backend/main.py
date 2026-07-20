@@ -1,4 +1,4 @@
-from fastapi import FastAPI, UploadFile, File, Form
+from fastapi import FastAPI, UploadFile, File, Form, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 import torch
 import torch.nn as nn
@@ -8,22 +8,12 @@ import io
 import json
 import os
 import re
+from contextlib import asynccontextmanager
 
 try:
     from deep_translator import GoogleTranslator
 except ImportError:
     GoogleTranslator = None
-
-app = FastAPI(title="AI Crop Disease Detection API")
-
-# Allow requests from the Next.js frontend
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model = None
@@ -40,8 +30,13 @@ def load_model():
         print("Warning: class_names.json not found! Using fallback class names.")
         class_names = [f"Class {i}" for i in range(38)]
         
-    # Initialize Model architecture
-    model = models.mobilenet_v2(pretrained=False)
+    # Initialize Model architecture safely with modern torchvision support
+    try:
+        from torchvision.models import MobileNet_V2_Weights
+        model = models.mobilenet_v2(weights=None)
+    except (ImportError, AttributeError):
+        model = models.mobilenet_v2(pretrained=False)
+
     model.classifier[1] = nn.Linear(model.last_channel, len(class_names))
     
     # Load weights
@@ -62,9 +57,21 @@ transform = transforms.Compose([
     transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
 ])
 
-@app.on_event("startup")
-async def startup_event():
+@asynccontextmanager
+async def lifespan(app: FastAPI):
     load_model()
+    yield
+
+app = FastAPI(title="AI Crop Disease Detection API", lifespan=lifespan)
+
+# Allow requests from the Next.js frontend
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 def generate_detailed_advice(disease_key: str, raw_filename: str = "") -> dict:
     """
@@ -299,9 +306,12 @@ def translate_advice_report(report: dict, target_lang: str) -> dict:
 
 @app.post("/predict")
 async def predict(file: UploadFile = File(...), lang: str = Form("en")):
-    image_bytes = await file.read()
-    image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
-    
+    try:
+        image_bytes = await file.read()
+        image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
+    except Exception as e:
+        raise HTTPException(status_code=400, detail="Invalid image file provided.")
+
     # Preprocess image
     input_tensor = transform(image)
     input_batch = input_tensor.unsqueeze(0).to(device)
