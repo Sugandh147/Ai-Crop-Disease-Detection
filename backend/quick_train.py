@@ -1,11 +1,11 @@
+import os
+import json
+import random
 import torch
 import torch.nn as nn
 import torch.optim as optim
 from torchvision import models, transforms, datasets
 from torch.utils.data import DataLoader, Subset
-import os
-import json
-import random
 
 def quick_train(data_dir, num_epochs=3, max_per_class=50, save_path="model.pth"):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")

@@ -1,14 +1,16 @@
+import os
+import io
+import json
+import re
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from PIL import Image
+
 import torch
 import torch.nn as nn
 from torchvision import models, transforms
-from PIL import Image
-import io
-import json
-import os
-import re
-from contextlib import asynccontextmanager
 
 try:
     from deep_translator import GoogleTranslator

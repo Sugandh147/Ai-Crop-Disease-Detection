@@ -1,10 +1,10 @@
+import os
+import json
 import torch
 import torch.nn as nn
 import torch.optim as optim
 from torchvision import models
 from dataset import get_dataloaders
-import os
-import json
 
 def train_model(data_dir, num_epochs=5, batch_size=32, save_path="model.pth"):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
