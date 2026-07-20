@@ -105,7 +105,7 @@ const Navbar = () => {
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="h-12 w-12"
             >
-              {isMobileMenuOpen ? <X className="h-8 w-8" /> : <Menu className="h-8 w-8" />}
+              {isMobileMenuOpen ? <X className="h-8 w-8 text-foreground" /> : <Menu className="h-8 w-8 text-foreground" />}
             </Button>
           </div>
         </div>
@@ -137,7 +137,7 @@ const Navbar = () => {
           </Link>
 
           <div className="pt-4 border-t">
-            <p className="px-3 pb-2 text-lg font-semibold text-muted-foreground">Select Language</p>
+            <p className="px-3 pb-2 text-lg font-semibold text-muted-foreground">{t('selectLanguage')}</p>
             <div className="grid grid-cols-2 gap-2 max-h-60 overflow-y-auto p-2">
               {(Object.keys(languageNames) as LanguageCode[]).map((code) => (
                 <button

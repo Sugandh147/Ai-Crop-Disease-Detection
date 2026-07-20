@@ -61,7 +61,7 @@ export default function Home() {
         >
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400 font-medium mb-8">
             <Sparkles className="h-5 w-5" />
-            <span>AI Powered Agriculture</span>
+            <span>{t('aiTag')}</span>
           </div>
           
           <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight text-foreground mb-6">
@@ -120,26 +120,26 @@ export default function Home() {
       {/* Dashboard Preview Section */}
       <section className="py-24 bg-muted/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-4xl font-bold mb-6">Future Capabilities</h2>
+          <h2 className="text-4xl font-bold mb-6">{t('futureCapabilities')}</h2>
           <p className="text-xl text-muted-foreground mb-16 max-w-3xl mx-auto">
-            Our platform is continuously evolving. Soon, you will have access to powerful analytics to monitor your entire farm's health.
+            {t('futureSubtitle')}
           </p>
           
           <div className="grid md:grid-cols-3 gap-8">
             <DashboardPlaceholder 
               icon={<BarChart3 className="w-8 h-8 text-blue-500" />}
-              title="Crop Health Trends"
-              desc="Track the historical health of your crops over seasons."
+              title={t('healthTrendsTitle')}
+              desc={t('healthTrendsDesc')}
             />
             <DashboardPlaceholder 
               icon={<CloudRain className="w-8 h-8 text-indigo-500" />}
-              title="Weather Integration"
-              desc="Correlate disease outbreaks with hyper-local weather data."
+              title={t('weatherTitle')}
+              desc={t('weatherDesc')}
             />
             <DashboardPlaceholder 
               icon={<ShieldCheck className="w-8 h-8 text-green-500" />}
-              title="Yield Protection"
-              desc="Estimated crop saved through early AI intervention."
+              title={t('yieldTitle')}
+              desc={t('yieldDesc')}
             />
           </div>
         </div>
@@ -151,7 +151,7 @@ export default function Home() {
           <Sprout className="h-6 w-6 text-green-600" />
           <span className="text-xl font-bold text-foreground">{t('brand')}</span>
         </div>
-        <p>© 2026 Kisan AI. Empowering farmers with technology.</p>
+        <p>© 2026 {t('brand')}. {t('footerRights')}</p>
       </footer>
     </div>
   );
