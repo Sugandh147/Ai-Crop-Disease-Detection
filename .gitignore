@@ -1,0 +1,15 @@
+# Private Internship Notes
+INTERNSHIP_NOTES.md
+
+# General environments
+venv/
+env/
+.env
+node_modules/
+.next/
+__pycache__/
+*.pyc
+
+# OS Files
+.DS_Store
+Thumbs.db

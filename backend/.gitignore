@@ -1,0 +1,23 @@
+# Environments
+venv/
+env/
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# PyTorch Model Weights
+# (Allowed for internship submission since MobileNetV2 is ~14MB)
+*.pt
+*.h5
+*.keras
+
+# Dataset
+dataset/
+data/
+
+# OS Files
+.DS_Store
+Thumbs.db
