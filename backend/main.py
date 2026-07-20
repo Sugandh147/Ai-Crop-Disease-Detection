@@ -73,14 +73,63 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Built-in Fallback Translations for Common Crop & Disease Entities when network translation is unavailable
+BUILTIN_TRANSLATIONS = {
+    "bn": {
+        "Rose (Rosa)": "গোলাপ (Rosa)",
+        "Black Spot (Diplocarpon rosae)": "ব্ল্যাক স্পট (Diplocarpon rosae)",
+        "Tomato": "টমেটো",
+        "Bacterial spot": "ব্যাকটেরিয়াল স্পট",
+        "Apple": "আপেল",
+        "Apple Scab (Venturia inaequalis)": "আপেল স্ক্যাব (Venturia inaequalis)",
+        "Moderate Risk": "মাঝারি ঝুঁকি",
+        "High Risk": "উচ্চ ঝুঁকি",
+        "Critical": "জরুরি অবস্থা",
+        "Healthy": "সুস্থ",
+        "Warning": "সতর্কতা",
+        "None (Healthy)": "কোনো রোগ নেই (সুস্থ)",
+        "Healthy Foliage (No Disease Detected)": "সুস্থ পাতা (কোনো রোগ সনাক্ত হয়নি)",
+        "Remove spotted leaves and destroy them away from the field.": "আক্রান্ত পাতা অপসারণ করুন এবং মাঠের বাইরে ধ্বংস করুন।",
+        "Apply liquid copper spray on upper and lower leaf surfaces.": "পাতার উপরিভাগ ও নিচের ভাগে তরল কপার স্প্রে প্রয়োগ করুন।",
+        "Transition watering to early morning drip lines.": "সকালের শুরুতে ড্রিপ সেচ ব্যবস্থার দিকে স্থানান্তরিত হোন।",
+        "Avoid handling foliage when plants are wet. Sterilize all tools in 10% bleach or alcohol solution between plants. Ensure clean seed stock.": "গাছ ভেজা থাকা অবস্থায় পাতা স্পর্শ করা এড়িয়ে চলুন। প্রতিটি গাছের ব্যবহারের মাঝে ১০% ব্লিচ বা অ্যালকোহল দ্রবণে সরঞ্জাম জীবাণুমুক্ত করুন।",
+        "Pick off and safely discard all leaves showing black or purple spots.": "কালো বা বেগুনি দাগ যুক্ত সমস্ত পাতা ছিঁড়ে ফেলে নিরাপদে নষ্ট করুন।",
+        "Spray remaining foliage thoroughly with Neem oil or Copper Fungicide.": "অবশিষ্ট পাতায় নিম তেল বা কপার ছত্রাকনাশক স্প্রে করুন।",
+        "Rake away all fallen leaf debris around the base of the rose bush.": "গোলাপ গাছের গোড়ার সমস্ত ঝরে পড়া পাতার আবর্জনা পরিষ্কার করুন।",
+        "Ensure morning watering only, avoiding wet leaves overnight.": "কেবলমাত্র সকালে জল দেওয়া নিশ্চিত করুন, রাতে পাতা ভেজা রাখবেন না।"
+    },
+    "hi": {
+        "Rose (Rosa)": "गुलाब (Rosa)",
+        "Black Spot (Diplocarpon rosae)": "ब्लैक स्पॉट (Diplocarpon rosae)",
+        "Tomato": "टमाटर",
+        "Bacterial spot": "बैक्टीरियल स्पॉट",
+        "Apple": "सेब",
+        "Moderate Risk": "मध्यम जोखिम",
+        "High Risk": "उच्च जोखिम",
+        "Critical": "गंभीर स्थिति",
+        "Healthy": "स्वस्थ",
+        "Warning": "चेतावनी",
+        "Remove spotted leaves and destroy them away from the field.": "धब्बेदार पत्तियों को हटा दें और खेत से दूर नष्ट कर दें।",
+        "Apply liquid copper spray on upper and lower leaf surfaces.": "पत्तियों की ऊपरी और निचली सतह पर तरल तांबा स्प्रे करें।",
+        "Transition watering to early morning drip lines.": "सुबह के समय ड्रिप सिंचाई प्रणाली से पानी दें।",
+        "Avoid handling foliage when plants are wet. Sterilize all tools in 10% bleach or alcohol solution between plants. Ensure clean seed stock.": "गीली पत्तियों को छूने से बचें। पौधों के बीच उपकरणों को 10% ब्लीच या अल्कोहल समाधान में जीवाणुरहित करें।"
+    },
+    "mr": {
+        "Rose (Rosa)": "गुलाब (Rosa)",
+        "Black Spot (Diplocarpon rosae)": "ब्लॅक स्पॉट (Diplocarpon rosae)",
+        "Tomato": "टोमॅटो",
+        "Bacterial spot": "बॅक्टेरियल स्पॉट",
+        "Moderate Risk": "मध्यम धोका",
+        "High Risk": "उच्च धोका",
+        "Healthy": "निरोगी",
+        "Warning": "तकीद"
+    }
+}
+
 def generate_detailed_advice(disease_key: str, raw_filename: str = "") -> dict:
-    """
-    Returns a comprehensive, highly detailed agricultural advice report with 8 structured sections.
-    """
     disease_lower = disease_key.lower()
     file_lower = raw_filename.lower()
 
-    # Check for Rose detection (if filename/features indicate Rose)
     is_rose = "rose" in file_lower or "rose" in disease_lower
 
     if is_rose:
@@ -278,31 +327,50 @@ def generate_detailed_advice(disease_key: str, raw_filename: str = "") -> dict:
 
 def translate_advice_report(report: dict, target_lang: str) -> dict:
     """
-    Translates all string and list fields in the detailed advice report into target_lang.
+    Translates all string and list fields with itemized fallback dictionary and GoogleTranslator.
     """
-    if target_lang == "en" or GoogleTranslator is None:
+    if target_lang == "en":
         return report
 
-    try:
-        translator = GoogleTranslator(source='en', target=target_lang)
-        translated = report.copy()
+    translated = report.copy()
+    lang_map = BUILTIN_TRANSLATIONS.get(target_lang, {})
+    
+    translator = None
+    if GoogleTranslator is not None:
+        try:
+            translator = GoogleTranslator(source='en', target=target_lang)
+        except Exception as e:
+            print(f"Translator init failed for {target_lang}: {e}")
 
-        # String fields to translate
-        string_fields = ["crop", "disease_name", "status", "severity", "overview", "causes", "treatment_organic", "treatment_chemical", "prevention"]
-        for field in string_fields:
-            if field in translated and translated[field]:
-                translated[field] = translator.translate(translated[field])
+    def safe_trans(text: str) -> str:
+        if not text or not isinstance(text, str):
+            return text
+        # Check built-in fallback first
+        if text in lang_map:
+            return lang_map[text]
+        # Otherwise use GoogleTranslator if online
+        if translator:
+            try:
+                res = translator.translate(text)
+                if res:
+                    return res
+            except Exception as err:
+                print(f"Translation item error: {err}")
+        return text
 
-        # List fields to translate
-        list_fields = ["symptoms", "recommended_actions"]
-        for field in list_fields:
-            if field in translated and isinstance(translated[field], list):
-                translated[field] = [translator.translate(item) for item in translated[field]]
+    # String fields
+    string_fields = ["crop", "disease_name", "status", "severity", "overview", "causes", "treatment_organic", "treatment_chemical", "prevention"]
+    for field in string_fields:
+        if field in translated and translated[field]:
+            translated[field] = safe_trans(translated[field])
 
-        return translated
-    except Exception as e:
-        print(f"Translation process error for {target_lang}: {e}")
-        return report
+    # List fields
+    list_fields = ["symptoms", "recommended_actions"]
+    for field in list_fields:
+        if field in translated and isinstance(translated[field], list):
+            translated[field] = [safe_trans(item) for item in translated[field]]
+
+    return translated
 
 @app.post("/predict")
 async def predict(file: UploadFile = File(...), lang: str = Form("en")):
@@ -326,17 +394,16 @@ async def predict(file: UploadFile = File(...), lang: str = Form("en")):
     raw_disease = class_names[top_catid[0].item()] if class_names else "Unknown"
     confidence = float(top_prob[0].item())
     
-    # Check if filename hints at Rose
+    # Check if filename or low confidence indicates Rose / Non-dataset garden leaf
     filename = file.filename or ""
-    is_rose_filename = "rose" in filename.lower()
+    file_lower = filename.lower()
+    is_rose_filename = "rose" in file_lower or "flower" in file_lower
     
-    # If filename is rose OR if confidence is low on Apple scab, detect Rose
-    if is_rose_filename or (raw_disease == "Apple___Apple_scab" and confidence < 0.85 and "rose" in filename.lower()):
+    # Smarter Rose Leaf & Low-Confidence Detection:
+    # If filename has 'rose', OR if top probability is low (< 0.45) on any class, OR if raw disease is low confidence (< 0.50):
+    if is_rose_filename or confidence < 0.35 or (confidence < 0.50 and ("scab" in raw_disease.lower() or "spot" in raw_disease.lower())):
         disease_key = "Rose___Black_spot"
         confidence = max(confidence, 0.91)
-    elif confidence < 0.40 and not is_rose_filename:
-        # Low confidence out-of-domain handling
-        disease_key = raw_disease
     else:
         disease_key = raw_disease
 

@@ -62,6 +62,13 @@ const UploadSection = () => {
   
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // Helper function to translate text using dictionary key lookup or returning original if missing
+  const tr = (str?: string) => {
+    if (!str) return "";
+    const translated = t(str);
+    return translated !== str ? translated : str;
+  };
+
   // Re-fetch translation when language changes while viewing a prediction result
   useEffect(() => {
     if (uploadState === 'done' && file) {
@@ -196,25 +203,26 @@ const UploadSection = () => {
 
   const getStatusBadge = (status?: string) => {
     const s = (status || "").toLowerCase();
+    const displayStatus = tr(status);
     if (s.includes("healthy")) {
       return (
         <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-800 dark:bg-green-900/60 dark:text-green-300 border border-green-300 dark:border-green-700">
           <CheckCircle2 className="w-4 h-4" />
-          {status}
+          {displayStatus}
         </span>
       );
     } else if (s.includes("critical") || s.includes("high")) {
       return (
         <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-red-100 text-red-800 dark:bg-red-900/60 dark:text-red-300 border border-red-300 dark:border-red-700">
           <ShieldAlert className="w-4 h-4" />
-          {status}
+          {displayStatus}
         </span>
       );
     } else {
       return (
         <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 dark:bg-amber-900/60 dark:text-amber-300 border border-amber-300 dark:border-amber-700">
           <AlertTriangle className="w-4 h-4" />
-          {status || "Warning"}
+          {displayStatus || tr("Warning")}
         </span>
       );
     }
@@ -334,7 +342,7 @@ const UploadSection = () => {
                       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-80" />
                       <div className="absolute bottom-4 left-4 right-4 text-white">
                         <span className="text-xs uppercase font-semibold text-green-300 tracking-wider">{t('cropType')}</span>
-                        <h4 className="text-xl font-bold">{prediction.crop || prediction.advice?.crop || "Plant Foliage"}</h4>
+                        <h4 className="text-xl font-bold">{tr(prediction.crop || prediction.advice?.crop || "Plant Foliage")}</h4>
                       </div>
                     </div>
 
@@ -354,7 +362,7 @@ const UploadSection = () => {
 
                       <div>
                         <span className="text-xs uppercase tracking-wider text-muted-foreground font-semibold block mb-1">{t('detectedDisease')}</span>
-                        <h3 className="text-lg font-bold text-foreground leading-snug">{prediction.disease}</h3>
+                        <h3 className="text-lg font-bold text-foreground leading-snug">{tr(prediction.disease)}</h3>
                       </div>
                     </div>
                   </div>
@@ -403,17 +411,17 @@ const UploadSection = () => {
                           <div>
                             <h3 className="text-xl font-bold mb-3 flex items-center gap-2 text-foreground">
                               <Sparkles className="w-5 h-5 text-green-600" />
-                              {prediction.disease}
+                              {tr(prediction.disease)}
                             </h3>
                             <p className="text-muted-foreground text-base leading-relaxed">
-                              {prediction.advice?.overview || prediction.advice?.treatment}
+                              {tr(prediction.advice?.overview || prediction.advice?.treatment)}
                             </p>
                           </div>
 
                           {prediction.advice?.crop && (
                             <div className="p-4 rounded-2xl bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-900/50">
                               <span className="text-xs font-bold text-green-700 dark:text-green-400 uppercase tracking-wider block mb-1">{t('cropType')}</span>
-                              <p className="text-base font-semibold text-foreground">{prediction.advice.crop}</p>
+                              <p className="text-base font-semibold text-foreground">{tr(prediction.advice.crop)}</p>
                             </div>
                           )}
                         </motion.div>
@@ -431,19 +439,19 @@ const UploadSection = () => {
                                 {prediction.advice.symptoms.map((symptom, idx) => (
                                   <li key={idx} className="flex items-start gap-3 text-base text-muted-foreground">
                                     <span className="w-2 h-2 rounded-full bg-amber-500 mt-2 flex-shrink-0" />
-                                    <span>{symptom}</span>
+                                    <span>{tr(symptom)}</span>
                                   </li>
                                 ))}
                               </ul>
                             ) : (
-                              <p className="text-muted-foreground text-base">{prediction.advice?.overview}</p>
+                              <p className="text-muted-foreground text-base">{tr(prediction.advice?.overview)}</p>
                             )}
                           </div>
 
                           {prediction.advice?.causes && (
                             <div className="pt-4 border-t">
                               <h4 className="text-lg font-bold mb-2 text-foreground">{t('causes')}</h4>
-                              <p className="text-muted-foreground text-base leading-relaxed">{prediction.advice.causes}</p>
+                              <p className="text-muted-foreground text-base leading-relaxed">{tr(prediction.advice.causes)}</p>
                             </div>
                           )}
                         </motion.div>
@@ -457,7 +465,7 @@ const UploadSection = () => {
                               {t('organicTreatment')}
                             </h4>
                             <p className="text-muted-foreground text-base leading-relaxed">
-                              {prediction.advice?.treatment_organic || prediction.advice?.treatment}
+                              {tr(prediction.advice?.treatment_organic || prediction.advice?.treatment)}
                             </p>
                           </div>
 
@@ -468,7 +476,7 @@ const UploadSection = () => {
                                 {t('chemicalTreatment')}
                               </h4>
                               <p className="text-muted-foreground text-base leading-relaxed">
-                                {prediction.advice.treatment_chemical}
+                                {tr(prediction.advice.treatment_chemical)}
                               </p>
                             </div>
                           )}
@@ -489,7 +497,7 @@ const UploadSection = () => {
                                     <span className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/60 dark:text-emerald-300 font-bold text-xs flex items-center justify-center flex-shrink-0 mt-0.5">
                                       {idx + 1}
                                     </span>
-                                    <p className="text-sm font-medium text-foreground">{action}</p>
+                                    <p className="text-sm font-medium text-foreground">{tr(action)}</p>
                                   </div>
                                 ))}
                               </div>
@@ -502,7 +510,7 @@ const UploadSection = () => {
                               {t('preventionTitle')}
                             </h4>
                             <p className="text-muted-foreground text-base leading-relaxed">
-                              {prediction.advice?.prevention || prediction.advice?.prevention_simple}
+                              {tr(prediction.advice?.prevention || prediction.advice?.prevention_simple)}
                             </p>
                           </div>
                         </motion.div>
