@@ -4,6 +4,11 @@ MODEL_TRAINING_GUIDE.md
 FRONTEND_ARCHITECTURE.md
 BACKEND_ARCHITECTURE.md
 
+# Model Binary Weights (Local Only)
+*.pth
+*.bin
+*.pt
+
 # General environments
 venv/
 env/
