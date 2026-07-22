@@ -5,12 +5,8 @@ import { Search, ShieldAlert, CheckCircle2, AlertTriangle, Leaf, ChevronRight, I
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { useLanguage } from "@/context/LanguageContext";
-import { getTranslation } from "@/translations";
 
-
-
-interface DiseaseItem {
+export interface DiseaseItem {
   id: string;
   name: string;
   crop: string;
@@ -96,42 +92,42 @@ const diseaseData: DiseaseItem[] = [
 ];
 
 export default function DiseaseLibrary() {
-  const { language } = useLanguage();
-  const tr = (key: string) => {
-    const res = getTranslation(language, key);
-    return res !== key ? res : key;
-  };
-
-  const [search, setSearch] = useState("");
-  const [selectedCrop, setSelectedCrop] = useState("All");
+  const [search, setSearch] = useState<string>("");
+  const [selectedCrop, setSelectedCrop] = useState<string>("All");
   const [selectedItem, setSelectedItem] = useState<DiseaseItem | null>(null);
 
-  const crops = ["All", "Potato", "Tomato", "Corn", "Apple", "Grape"];
+  const crops: string[] = ["All", "Potato", "Tomato", "Corn", "Apple", "Grape"];
 
   const filteredData = diseaseData.filter((item) => {
-    const matchesCrop = selectedCrop === "All" || item.crop.toLowerCase() === selectedCrop.toLowerCase();
-    const matchesSearch = item.name.toLowerCase().includes(search.toLowerCase()) || item.crop.toLowerCase().includes(search.toLowerCase()) || item.symptomSummary.toLowerCase().includes(search.toLowerCase());
+    const matchesCrop =
+      selectedCrop === "All" || item.crop.toLowerCase() === selectedCrop.toLowerCase();
+    const query = search.toLowerCase().trim();
+    const matchesSearch =
+      query === "" ||
+      item.name.toLowerCase().includes(query) ||
+      item.crop.toLowerCase().includes(query) ||
+      item.symptomSummary.toLowerCase().includes(query);
     return matchesCrop && matchesSearch;
   });
 
-  const getSeverityBadge = (sev: string) => {
+  const getSeverityBadge = (sev: DiseaseItem["severity"]) => {
     if (sev === "Healthy") {
       return (
         <span className="px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-800 dark:bg-green-900/60 dark:text-green-300 border border-green-300 dark:border-green-700 flex items-center gap-1">
-          <CheckCircle2 className="w-3.5 h-3.5" /> {tr("Healthy")}
+          <CheckCircle2 className="w-3.5 h-3.5" /> Healthy
         </span>
       );
     }
     if (sev === "High") {
       return (
         <span className="px-3 py-1 rounded-full text-xs font-bold bg-red-100 text-red-800 dark:bg-red-900/60 dark:text-red-300 border border-red-300 dark:border-red-700 flex items-center gap-1">
-          <ShieldAlert className="w-3.5 h-3.5" /> {tr("High Risk")}
+          <ShieldAlert className="w-3.5 h-3.5" /> High Risk
         </span>
       );
     }
     return (
       <span className="px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 dark:bg-amber-900/60 dark:text-amber-300 border border-amber-300 dark:border-amber-700 flex items-center gap-1">
-        <AlertTriangle className="w-3.5 h-3.5" /> {tr("Moderate Risk")}
+        <AlertTriangle className="w-3.5 h-3.5" /> Moderate Risk
       </span>
     );
   };
@@ -181,7 +177,6 @@ export default function DiseaseLibrary() {
         </div>
       </div>
 
-
       {/* Grid of Cards */}
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredData.map((item) => (
@@ -192,9 +187,14 @@ export default function DiseaseLibrary() {
           >
             <CardContent className="p-6 space-y-4">
               <div className="flex justify-between items-start">
-                <span className="text-xs uppercase font-bold text-green-700 dark:text-green-400 tracking-wider">
-                  {item.crop}
-                </span>
+                <div className="flex items-center gap-2">
+                  <div className={`p-2 rounded-xl ${item.iconBg}`}>
+                    <Leaf className="w-4 h-4" />
+                  </div>
+                  <span className="text-xs uppercase font-bold text-green-700 dark:text-green-400 tracking-wider">
+                    {item.crop}
+                  </span>
+                </div>
                 {getSeverityBadge(item.severity)}
               </div>
 
@@ -232,6 +232,7 @@ export default function DiseaseLibrary() {
                 <h3 className="text-2xl font-extrabold text-foreground mt-1">{selectedItem.name}</h3>
               </div>
               <button
+                type="button"
                 onClick={() => setSelectedItem(null)}
                 className="p-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted"
               >
@@ -257,6 +258,7 @@ export default function DiseaseLibrary() {
 
             <div className="flex justify-end pt-2">
               <Button
+                type="button"
                 className="rounded-xl bg-green-600 hover:bg-green-700 text-white px-6"
                 onClick={() => setSelectedItem(null)}
               >
