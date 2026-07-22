@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { LanguageProvider } from "@/context/LanguageContext";
@@ -7,11 +7,11 @@ import Navbar from "@/components/Navbar";
 import FloatingHelp from "@/components/FloatingHelp";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
-const inter = Inter({ subsets: ["latin"] });
+const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Kisan AI | Crop Disease Detection",
-  description: "AI-powered crop disease detection web application for farmers.",
+  title: "Kisan AI | AI Crop Disease Detection & Agricultural Advisor",
+  description: "AI-powered instant crop disease detection, organic remedies, and treatment guide for farmers.",
 };
 
 export default function RootLayout({
@@ -21,7 +21,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
+      <body className={`${jakarta.className} selection:bg-green-600 selection:text-white`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
@@ -42,3 +42,4 @@ export default function RootLayout({
     </html>
   );
 }
+

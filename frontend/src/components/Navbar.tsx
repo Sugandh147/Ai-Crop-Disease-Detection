@@ -31,13 +31,16 @@ const Navbar = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-6">
-            <Link href="/" className="text-lg font-medium hover:text-green-600 transition-colors">
+            <Link href="/" className="text-base font-semibold hover:text-green-600 transition-colors">
               {t('home')}
             </Link>
-            <Link href="#upload" className="text-lg font-medium hover:text-green-600 transition-colors">
+            <Link href="#upload" className="text-base font-semibold hover:text-green-600 transition-colors">
               {t('upload')}
             </Link>
-            <Link href="#about" className="text-lg font-medium hover:text-green-600 transition-colors">
+            <Link href="#library" className="text-base font-semibold hover:text-green-600 transition-colors">
+              Disease Library
+            </Link>
+            <Link href="#contact" className="text-base font-semibold hover:text-green-600 transition-colors">
               {t('about')}
             </Link>
 
@@ -45,17 +48,17 @@ const Navbar = () => {
             <div className="relative">
               <Button 
                 variant="outline" 
-                className="flex items-center gap-2 text-lg h-10 px-4"
+                className="flex items-center gap-2 text-base h-10 px-4 rounded-xl border-2"
                 onClick={() => setIsLangMenuOpen(!isLangMenuOpen)}
                 aria-haspopup="true"
                 aria-expanded={isLangMenuOpen}
               >
-                <Languages className="h-5 w-5" />
+                <Languages className="h-4 w-4 text-green-600" />
                 <span>{languageNames[language].split(' ')[0]}</span>
               </Button>
               
               {isLangMenuOpen && (
-                <div className="absolute right-0 mt-2 w-56 max-h-96 overflow-y-auto rounded-md shadow-lg bg-card border z-50">
+                <div className="absolute right-0 mt-2 w-56 max-h-96 overflow-y-auto rounded-2xl shadow-2xl bg-card border z-50 p-1">
                   <div className="py-1">
                     {(Object.keys(languageNames) as LanguageCode[]).map((code) => (
                       <button
@@ -64,7 +67,7 @@ const Navbar = () => {
                           setLanguage(code);
                           setIsLangMenuOpen(false);
                         }}
-                        className={`block w-full text-left px-4 py-3 text-base hover:bg-green-50 hover:text-green-700 dark:hover:bg-green-900/20 dark:hover:text-green-400 ${language === code ? 'font-bold bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400' : ''}`}
+                        className={`block w-full text-left px-4 py-2.5 rounded-xl text-sm transition-colors hover:bg-green-50 hover:text-green-700 dark:hover:bg-green-900/20 dark:hover:text-green-400 ${language === code ? 'font-bold bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400' : ''}`}
                       >
                         {languageNames[code]}
                       </button>
@@ -79,11 +82,11 @@ const Navbar = () => {
               variant="ghost"
               size="icon"
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className="h-10 w-10"
+              className="h-10 w-10 rounded-xl"
               aria-label="Toggle theme"
             >
-              <Sun className="h-6 w-6 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-              <Moon className="absolute h-6 w-6 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+              <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+              <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
             </Button>
           </div>
 
@@ -95,8 +98,8 @@ const Navbar = () => {
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
               className="h-12 w-12"
             >
-              <Sun className="h-7 w-7 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-              <Moon className="absolute h-7 w-7 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+              <Sun className="h-6 w-6 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+              <Moon className="absolute h-6 w-6 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
             </Button>
             
             <Button
@@ -105,7 +108,7 @@ const Navbar = () => {
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="h-12 w-12"
             >
-              {isMobileMenuOpen ? <X className="h-8 w-8 text-foreground" /> : <Menu className="h-8 w-8 text-foreground" />}
+              {isMobileMenuOpen ? <X className="h-7 w-7 text-foreground" /> : <Menu className="h-7 w-7 text-foreground" />}
             </Button>
           </div>
         </div>
@@ -113,24 +116,31 @@ const Navbar = () => {
 
       {/* Mobile Navigation */}
       {isMobileMenuOpen && (
-        <div className="md:hidden border-t bg-background px-4 py-4 shadow-lg space-y-4">
+        <div className="md:hidden border-t bg-background px-4 py-4 shadow-lg space-y-3 animate-in slide-in-from-top duration-200">
           <Link 
             href="/" 
-            className="block px-3 py-4 rounded-md text-xl font-medium hover:bg-green-50 dark:hover:bg-green-900/20"
+            className="block px-3 py-3 rounded-xl text-lg font-semibold hover:bg-green-50 dark:hover:bg-green-900/20"
             onClick={() => setIsMobileMenuOpen(false)}
           >
             {t('home')}
           </Link>
           <Link 
             href="#upload" 
-            className="block px-3 py-4 rounded-md text-xl font-medium hover:bg-green-50 dark:hover:bg-green-900/20"
+            className="block px-3 py-3 rounded-xl text-lg font-semibold hover:bg-green-50 dark:hover:bg-green-900/20"
             onClick={() => setIsMobileMenuOpen(false)}
           >
             {t('upload')}
           </Link>
           <Link 
-            href="#about" 
-            className="block px-3 py-4 rounded-md text-xl font-medium hover:bg-green-50 dark:hover:bg-green-900/20"
+            href="#library" 
+            className="block px-3 py-3 rounded-xl text-lg font-semibold hover:bg-green-50 dark:hover:bg-green-900/20"
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
+            Disease Library
+          </Link>
+          <Link 
+            href="#contact" 
+            className="block px-3 py-3 rounded-xl text-lg font-semibold hover:bg-green-50 dark:hover:bg-green-900/20"
             onClick={() => setIsMobileMenuOpen(false)}
           >
             {t('about')}
