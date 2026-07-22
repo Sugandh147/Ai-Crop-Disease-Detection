@@ -4,9 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "clean": "powershell -Command \"Remove-Item -Recurse -Force .next -ErrorAction SilentlyContinue\"",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"
+
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
