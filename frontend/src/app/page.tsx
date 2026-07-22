@@ -2,7 +2,8 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { Camera, Sparkles, Sprout, ShieldCheck, Zap, Leaf, Activity, BarChart3, CloudRain, BookOpen, CheckCircle, Globe2, Award } from "lucide-react";
+import { Camera, Sparkles, Sprout, ShieldCheck, Leaf, Activity, BarChart3, CloudRain, BookOpen } from "lucide-react";
+
 import { useLanguage } from "@/context/LanguageContext";
 import { getTranslation } from "@/translations";
 import { Button } from "@/components/ui/button";

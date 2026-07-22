@@ -17,21 +17,21 @@ export default function CameraModal({ isOpen, onClose, onCapture }: CameraModalP
   const [facingMode, setFacingMode] = useState<"environment" | "user">("environment");
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (isOpen && !capturedImage) {
-      startCamera();
-    } else {
-      stopCamera();
+  const stopCamera = React.useCallback(() => {
+    if (stream) {
+      stream.getTracks().forEach((track) => track.stop());
+      Promise.resolve().then(() => setStream(null));
     }
-    return () => {
-      stopCamera();
-    };
-  }, [isOpen, facingMode, capturedImage]);
+  }, [stream]);
 
-  const startCamera = async () => {
+
+  const startCamera = React.useCallback(async () => {
     try {
       setError(null);
-      stopCamera();
+      if (stream) {
+        stream.getTracks().forEach((track) => track.stop());
+        setStream(null);
+      }
       const mediaStream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: facingMode, width: { ideal: 1280 }, height: { ideal: 720 } },
       });
@@ -43,14 +43,24 @@ export default function CameraModal({ isOpen, onClose, onCapture }: CameraModalP
       console.error("Camera access error:", err);
       setError("Unable to access camera. Please check camera permissions or upload an image instead.");
     }
-  };
+  }, [facingMode, stream]);
 
-  const stopCamera = () => {
-    if (stream) {
-      stream.getTracks().forEach((track) => track.stop());
-      setStream(null);
+  useEffect(() => {
+    let active = true;
+    if (isOpen && !capturedImage) {
+      Promise.resolve().then(() => {
+        if (active) startCamera();
+      });
+    } else {
+      stopCamera();
     }
-  };
+    return () => {
+      active = false;
+      stopCamera();
+    };
+  }, [isOpen, facingMode, capturedImage, startCamera, stopCamera]);
+
+
 
   const takePhoto = () => {
     if (!videoRef.current) return;

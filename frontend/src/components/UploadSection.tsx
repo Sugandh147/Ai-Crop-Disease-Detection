@@ -22,9 +22,9 @@ import {
   VolumeX,
   Printer,
   Copy,
-  Check,
-  Zap
+  Check
 } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/context/LanguageContext";
 import { getTranslation } from "@/translations";
@@ -132,11 +132,20 @@ const UploadSection = () => {
     }
   };
 
+  const prevLangRef = useRef(language);
+
   useEffect(() => {
-    if (uploadState === 'done' && file) {
-      reTranslatePrediction(file, language);
+    if (prevLangRef.current !== language) {
+      prevLangRef.current = language;
+      if (uploadState === 'done' && file) {
+        Promise.resolve().then(() => {
+          reTranslatePrediction(file, language);
+        });
+      }
     }
   }, [language, file, uploadState]);
+
+
 
 
   // Clean up speech on unmount

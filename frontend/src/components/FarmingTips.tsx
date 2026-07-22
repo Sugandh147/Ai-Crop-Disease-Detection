@@ -1,8 +1,9 @@
 "use client";
 
 import React from "react";
-import { CheckCircle2, XCircle, Sun, CloudRain, Thermometer, ShieldAlert, Sparkles, Lightbulb } from "lucide-react";
+import { CheckCircle2, XCircle, CloudRain, Thermometer, ShieldAlert, Lightbulb } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+
 
 export default function FarmingTips() {
   return (
@@ -69,7 +70,8 @@ export default function FarmingTips() {
                   <XCircle className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="text-2xl font-extrabold text-red-900 dark:text-red-300">Avoid (Don't)</h3>
+                  <h3 className="text-2xl font-extrabold text-red-900 dark:text-red-300">Avoid (Don&apos;t)</h3>
+
                   <p className="text-sm text-red-700 dark:text-red-400">Common causes of false diagnostics</p>
                 </div>
               </div>

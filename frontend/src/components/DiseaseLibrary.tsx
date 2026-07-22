@@ -97,7 +97,10 @@ const diseaseData: DiseaseItem[] = [
 
 export default function DiseaseLibrary() {
   const { language } = useLanguage();
-  const t = (key: string) => getTranslation(language, key);
+  const tr = (key: string) => {
+    const res = getTranslation(language, key);
+    return res !== key ? res : key;
+  };
 
   const [search, setSearch] = useState("");
   const [selectedCrop, setSelectedCrop] = useState("All");
@@ -115,23 +118,24 @@ export default function DiseaseLibrary() {
     if (sev === "Healthy") {
       return (
         <span className="px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-800 dark:bg-green-900/60 dark:text-green-300 border border-green-300 dark:border-green-700 flex items-center gap-1">
-          <CheckCircle2 className="w-3.5 h-3.5" /> Healthy
+          <CheckCircle2 className="w-3.5 h-3.5" /> {tr("Healthy")}
         </span>
       );
     }
     if (sev === "High") {
       return (
         <span className="px-3 py-1 rounded-full text-xs font-bold bg-red-100 text-red-800 dark:bg-red-900/60 dark:text-red-300 border border-red-300 dark:border-red-700 flex items-center gap-1">
-          <ShieldAlert className="w-3.5 h-3.5" /> High Risk
+          <ShieldAlert className="w-3.5 h-3.5" /> {tr("High Risk")}
         </span>
       );
     }
     return (
       <span className="px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 dark:bg-amber-900/60 dark:text-amber-300 border border-amber-300 dark:border-amber-700 flex items-center gap-1">
-        <AlertTriangle className="w-3.5 h-3.5" /> Moderate
+        <AlertTriangle className="w-3.5 h-3.5" /> {tr("Moderate Risk")}
       </span>
     );
   };
+
 
   return (
     <section className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" id="library">
