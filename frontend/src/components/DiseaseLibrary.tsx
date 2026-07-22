@@ -2,9 +2,10 @@
 
 import React, { useState } from "react";
 import { Search, ShieldAlert, CheckCircle2, AlertTriangle, Leaf, ChevronRight, Info } from "lucide-react";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+
+
 
 export interface DiseaseItem {
   id: string;
@@ -151,13 +152,15 @@ export default function DiseaseLibrary() {
       <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-10">
         <div className="relative w-full md:w-80">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-          <Input
+          <input
+            type="text"
             placeholder="Search disease name, crop, or symptoms..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-11 h-12 rounded-2xl bg-card border-2 shadow-sm text-base focus:border-green-500"
+            className="w-full h-12 pl-11 pr-4 rounded-2xl bg-card border-2 shadow-sm text-base focus:border-green-500 focus:outline-none transition-all text-foreground placeholder:text-muted-foreground"
           />
         </div>
+
 
         <div className="flex flex-wrap gap-2 w-full md:w-auto overflow-x-auto pb-2 md:pb-0">
           {crops.map((c) => (
