@@ -11,20 +11,21 @@ type LanguageContextType = {
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export const LanguageProvider = ({ children }: { children: React.ReactNode }) => {
-  const [language, setLanguage] = useState<LanguageCode>("en");
-
-  useEffect(() => {
-    const savedLang = localStorage.getItem("appLanguage") as LanguageCode;
-    if (savedLang) {
-      setLanguage(savedLang);
+  const [language, setLanguage] = useState<LanguageCode>(() => {
+    if (typeof window !== "undefined") {
+      const savedLang = localStorage.getItem("appLanguage") as LanguageCode;
+      if (savedLang) return savedLang;
     }
-  }, []);
-
+    return "en";
+  });
 
   const handleSetLanguage = (lang: LanguageCode) => {
     setLanguage(lang);
-    localStorage.setItem("appLanguage", lang);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("appLanguage", lang);
+    }
   };
+
 
   // The initial state matches the server ("en").
   // After mount, useEffect will check localStorage and update state if needed,

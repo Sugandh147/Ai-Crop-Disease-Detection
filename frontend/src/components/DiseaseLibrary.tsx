@@ -5,6 +5,9 @@ import { Search, ShieldAlert, CheckCircle2, AlertTriangle, Leaf, ChevronRight, I
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { useLanguage } from "@/context/LanguageContext";
+import { getTranslation } from "@/translations";
+
 
 
 interface DiseaseItem {

@@ -112,11 +112,32 @@ const UploadSection = () => {
     return translated !== str ? translated : str;
   };
 
+  const reTranslatePrediction = async (currentFile: File, targetLang: string) => {
+    try {
+      const formData = new FormData();
+      formData.append("file", currentFile);
+      formData.append("lang", targetLang);
+
+      const response = await fetch("http://localhost:8000/predict", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (response.ok) {
+        const data: PredictionResult = await response.json();
+        setPrediction(data);
+      }
+    } catch (error) {
+      console.error("Re-translation failed:", error);
+    }
+  };
+
   useEffect(() => {
     if (uploadState === 'done' && file) {
       reTranslatePrediction(file, language);
     }
-  }, [language]);
+  }, [language, file, uploadState]);
+
 
   // Clean up speech on unmount
   useEffect(() => {
@@ -234,25 +255,6 @@ const UploadSection = () => {
     }
   };
 
-  const reTranslatePrediction = async (currentFile: File, targetLang: string) => {
-    try {
-      const formData = new FormData();
-      formData.append("file", currentFile);
-      formData.append("lang", targetLang);
-
-      const response = await fetch("http://localhost:8000/predict", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (response.ok) {
-        const data: PredictionResult = await response.json();
-        setPrediction(data);
-      }
-    } catch (error) {
-      console.error("Re-translation failed:", error);
-    }
-  };
 
   const reset = () => {
     if (typeof window !== "undefined" && window.speechSynthesis) {
