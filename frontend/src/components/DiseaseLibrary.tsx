@@ -109,7 +109,7 @@ export default function DiseaseLibrary() {
   const crops = ["All", "Potato", "Tomato", "Corn", "Apple", "Grape"];
 
   const filteredData = diseaseData.filter((item) => {
-    const matchesCrop = selectedCrop === "All" || item.crop.toLowerCase() === selectedCrop.toLowerCase() || (selectedCrop === "All" && item.crop === "General");
+    const matchesCrop = selectedCrop === "All" || item.crop.toLowerCase() === selectedCrop.toLowerCase();
     const matchesSearch = item.name.toLowerCase().includes(search.toLowerCase()) || item.crop.toLowerCase().includes(search.toLowerCase()) || item.symptomSummary.toLowerCase().includes(search.toLowerCase());
     return matchesCrop && matchesSearch;
   });
@@ -136,7 +136,6 @@ export default function DiseaseLibrary() {
     );
   };
 
-
   return (
     <section className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" id="library">
       <div className="text-center max-w-3xl mx-auto mb-12">
@@ -145,7 +144,7 @@ export default function DiseaseLibrary() {
           Agricultural Knowledge Hub
         </div>
         <h2 className="text-4xl sm:text-5xl font-extrabold tracking-tight mb-4">
-          Crop Disease Library & Field Guide
+          Crop Disease Library &amp; Field Guide
         </h2>
         <p className="text-muted-foreground text-lg sm:text-xl">
           Browse verified plant pathologies, key visual markers, and recommended organic remedies.
@@ -167,6 +166,7 @@ export default function DiseaseLibrary() {
         <div className="flex flex-wrap gap-2 w-full md:w-auto overflow-x-auto pb-2 md:pb-0">
           {crops.map((c) => (
             <button
+              type="button"
               key={c}
               onClick={() => setSelectedCrop(c)}
               className={`px-5 py-2.5 rounded-full text-sm font-semibold transition-all ${
@@ -180,6 +180,7 @@ export default function DiseaseLibrary() {
           ))}
         </div>
       </div>
+
 
       {/* Grid of Cards */}
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
